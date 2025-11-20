@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, JWTManager, jwt_required, get_jwt_identity
+from services import fetch_ticketmaster_events
 
 # 1. Load environment variables
 load_dotenv()
@@ -80,13 +81,24 @@ def login():
 
     return jsonify({"msg": "Invalid credentials"}), 401
 
-# Protected Route Example
 @app.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
     current_user_id = get_jwt_identity()
     user = User.query.get(current_user_id)
     return jsonify(logged_in_as=user.username), 200
+
+@app.route('/events', methods=['GET'])
+def get_events():
+    # Get city from query parameter (e.g. /events?city=London)
+    city = request.args.get('city', 'New York') 
+    
+    events = fetch_ticketmaster_events(city)
+    
+    if not events:
+        return jsonify({"msg": "No events found or API error"}), 404
+        
+    return jsonify(events), 200
 
 # 6. Run the App
 if __name__ == '__main__':
