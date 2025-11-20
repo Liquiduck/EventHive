@@ -79,11 +79,5 @@ npm install
 npm run dev
 ```
 
-## 🧠 Key Technical Decisions
-
-* **Separation of Concerns:** The frontend handles presentation logic while the backend manages data hygiene and API proxying. This prevents exposing API keys to the client.
-* **JWT vs Sessions:** Chosen JWT for stateless authentication, allowing for easier horizontal scaling in the future.
-* **Optimistic UI:** The interface provides immediate feedback (loading skeletons, toast notifications) before the data fully settles, improving perceived performance.
-
 ## 📝 License
 This project is open source and available under the [MIT License](LICENSE).
