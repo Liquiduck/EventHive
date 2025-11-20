@@ -38,6 +38,21 @@ class User(db.Model):
 
     def __repr__(self):
         return f'<User {self.username}>'
+    
+class SavedEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # We save specific details so we don't have to query Ticketmaster again for the profile page
+    tm_id = db.Column(db.String(50), nullable=False) # Ticketmaster ID
+    name = db.Column(db.String(200), nullable=False)
+    date = db.Column(db.String(50))
+    venue = db.Column(db.String(200))
+    image = db.Column(db.String(500))
+    url = db.Column(db.String(500))
+
+    def __repr__(self):
+        return f'<SavedEvent {self.name}>'
 
 # 5. Routes
 @app.route('/')
@@ -76,7 +91,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and user.check_password(password):
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         return jsonify(access_token=access_token), 200
 
     return jsonify({"msg": "Invalid credentials"}), 401
@@ -90,8 +105,7 @@ def protected():
 
 @app.route('/events', methods=['GET'])
 def get_events():
-    # Get city from query parameter (e.g. /events?city=London)
-    city = request.args.get('city', 'New York') 
+    city = request.args.get('city', 'Istanbul') 
     
     events = fetch_ticketmaster_events(city)
     
@@ -99,6 +113,65 @@ def get_events():
         return jsonify({"msg": "No events found or API error"}), 404
         
     return jsonify(events), 200
+
+@app.route('/save_event', methods=['POST'])
+@jwt_required()
+def save_event():
+    current_user_id = get_jwt_identity()
+    data = request.get_json()
+
+    # Check if already saved to prevent duplicates
+    existing = SavedEvent.query.filter_by(user_id=current_user_id, tm_id=data.get('id')).first()
+    if existing:
+        return jsonify({"msg": "Event already saved"}), 409
+
+    new_event = SavedEvent(
+        user_id=current_user_id,
+        tm_id=data.get('id'),
+        name=data.get('name'),
+        date=data.get('date'),
+        venue=data.get('venue'),
+        image=data.get('image'),
+        url=data.get('url')
+    )
+
+    db.session.add(new_event)
+    db.session.commit()
+    
+    return jsonify({"msg": "Event saved successfully!"}), 201
+
+@app.route('/my_events', methods=['GET'])
+@jwt_required()
+def get_my_events():
+    current_user_id = get_jwt_identity()
+    saved_events = SavedEvent.query.filter_by(user_id=current_user_id).all()
+    
+    results = []
+    for event in saved_events:
+        results.append({
+            "id": event.id, # Our DB ID
+            "tm_id": event.tm_id,
+            "name": event.name,
+            "date": event.date,
+            "venue": event.venue,
+            "image": event.image,
+            "url": event.url
+        })
+    
+    return jsonify(results), 200
+
+@app.route('/delete_event/<int:event_id>', methods=['DELETE'])
+@jwt_required()
+def delete_event(event_id):
+    current_user_id = get_jwt_identity()
+    event = SavedEvent.query.filter_by(id=event_id, user_id=current_user_id).first()
+
+    if not event:
+        return jsonify({"msg": "Event not found"}), 404
+
+    db.session.delete(event)
+    db.session.commit()
+    return jsonify({"msg": "Event removed"}), 200
 
 # 6. Run the App
 if __name__ == '__main__':
