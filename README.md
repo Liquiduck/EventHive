@@ -12,7 +12,6 @@ EventHive is a full-stack web application that aggregates real-time events from 
 * **Modern UI/UX:** Built with React and Tailwind CSS, featuring dark mode, glassmorphism design, micro-interactions (Framer Motion), and toast notifications.
 
 ## 🛠️ Tech Stack
-![alt text](image.png)
 ### Frontend
 * **React (Vite):** Component-based UI architecture.
 * **Tailwind CSS:** Utility-first styling for responsive design.
