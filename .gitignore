@@ -1,0 +1,10 @@
+*.env
+venv/
+__pycache__/
+*.pyc
+*.db
+pip-log.txt
+node_modules/
+build/
+dist/
+npm-debug.log*
