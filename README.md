@@ -2,7 +2,7 @@
 
 EventHive is a full-stack web application that aggregates real-time events from around the world using the Ticketmaster API. It allows users to discover concerts, sports, and arts events, and features a secure authentication system for users to create accounts and manage a personal collection of saved events.
 
-![EventHive Demo](.\screenshot.png)
+![EventHive Demo](./screenshot.png)
 ## 🚀 Features
 
 * **Real-Time Event Aggregation:** Fetches live data from the Ticketmaster Discovery API with server-side filtering for expired events.
