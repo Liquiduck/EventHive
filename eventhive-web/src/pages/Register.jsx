@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -15,7 +15,7 @@ const Register = () => {
         e.preventDefault();
         try {
             // Connect to /register route in Python
-            await axios.post('http://127.0.0.1:5000/register', formData);
+            await api.post('/register', formData);
             alert("Account created! Please login.");
             navigate('/login');
         } catch (err) {

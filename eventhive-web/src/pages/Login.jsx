@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
@@ -17,7 +17,7 @@ const Login = () => {
         
         try {
             // Connect to the /login route we built in Python!
-            const response = await axios.post('http://127.0.0.1:5000/login', formData);
+            const response = await api.post('/login', formData);
             
             // SAVE THE TOKEN (This is the most important part)
             localStorage.setItem('token', response.data.access_token);

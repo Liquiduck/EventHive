@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import toast from 'react-hot-toast'; // Pro Notifications
 import { motion } from 'framer-motion'; // Pro Animations
 
@@ -39,7 +39,7 @@ const Home = () => {
         }
 
         try {
-            await axios.post('http://127.0.0.1:5000/save_event', event, {
+            await api.post('/login', event, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // ✅ Success Toast
@@ -58,7 +58,7 @@ const Home = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await axios.get(`http://127.0.0.1:5000/events?city=${city}`);
+                const response = await api.get('/events?city=${city}');
                 setEvents(response.data);
             } catch (err) {
                 console.error("Error fetching events:", err);

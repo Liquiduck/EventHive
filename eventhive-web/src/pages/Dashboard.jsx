@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -10,7 +10,7 @@ const Dashboard = () => {
         const fetchMyEvents = async () => {
             const token = localStorage.getItem('token');
             try {
-                const response = await axios.get('http://127.0.0.1:5000/my_events', {
+                const response = await api.get('/events', {
                     headers: { Authorization: `Bearer ${token}` } // Send the ID Card
                 });
                 setEvents(response.data);
