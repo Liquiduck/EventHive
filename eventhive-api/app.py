@@ -28,6 +28,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    # Increased to 512 to prevent "value too long" errors on Render
     password_hash = db.Column(db.String(512), nullable=False)
 
     def set_password(self, password):
@@ -91,6 +92,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and user.check_password(password):
+        # Convert ID to string for the Token (required by JWT library)
         access_token = create_access_token(identity=str(user.id))
         return jsonify(access_token=access_token), 200
 
@@ -100,7 +102,8 @@ def login():
 @jwt_required()
 def protected():
     current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    # Convert back to int for DB query safety
+    user = User.query.get(int(current_user_id))
     return jsonify(logged_in_as=user.username), 200
 
 @app.route('/events', methods=['GET'])
@@ -117,7 +120,8 @@ def get_events():
 @app.route('/save_event', methods=['POST'])
 @jwt_required()
 def save_event():
-    current_user_id = get_jwt_identity()
+    # FIX: Convert token identity back to Integer for Database
+    current_user_id = int(get_jwt_identity())
     data = request.get_json()
 
     # Check if already saved to prevent duplicates
@@ -143,7 +147,8 @@ def save_event():
 @app.route('/my_events', methods=['GET'])
 @jwt_required()
 def get_my_events():
-    current_user_id = get_jwt_identity()
+    # FIX: Convert token identity back to Integer for Database
+    current_user_id = int(get_jwt_identity())
     saved_events = SavedEvent.query.filter_by(user_id=current_user_id).all()
     
     results = []
@@ -163,7 +168,8 @@ def get_my_events():
 @app.route('/delete_event/<int:event_id>', methods=['DELETE'])
 @jwt_required()
 def delete_event(event_id):
-    current_user_id = get_jwt_identity()
+    # FIX: Convert token identity back to Integer for Database
+    current_user_id = int(get_jwt_identity())
     event = SavedEvent.query.filter_by(id=event_id, user_id=current_user_id).first()
 
     if not event:
