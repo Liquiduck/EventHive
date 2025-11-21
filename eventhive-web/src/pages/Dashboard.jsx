@@ -10,7 +10,7 @@ const Dashboard = () => {
         const fetchMyEvents = async () => {
             const token = localStorage.getItem('token');
             try {
-                const response = await api.get('/events', {
+                const response = await api.get('/my_events', {
                     headers: { Authorization: `Bearer ${token}` } // Send the ID Card
                 });
                 setEvents(response.data);
