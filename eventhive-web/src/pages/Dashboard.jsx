@@ -26,7 +26,7 @@ const Dashboard = () => {
     const handleDelete = async (id) => {
         const token = localStorage.getItem('token');
         try {
-            await axios.delete(`http://127.0.0.1:5000/delete_event/${id}`, {
+            await api.delete(`/delete_event/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // Remove from screen instantly without reloading

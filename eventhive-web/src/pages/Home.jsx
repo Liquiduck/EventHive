@@ -39,7 +39,7 @@ const Home = () => {
         }
 
         try {
-            await api.post('/login', event, {
+            await api.post('/save_event', event, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             // ✅ Success Toast
@@ -58,7 +58,7 @@ const Home = () => {
             setLoading(true);
             setError(null);
             try {
-                const response = await api.get('/events?city=${city}');
+                const response = await api.get(`/events?city=${city}`);
                 setEvents(response.data);
             } catch (err) {
                 console.error("Error fetching events:", err);
